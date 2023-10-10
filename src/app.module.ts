@@ -38,6 +38,7 @@ import configuration from './config/entities/configuration';
 import { GlobalErrorFilter } from './routes/common/filters/global-error.filter';
 import { DataSourceErrorFilter } from './routes/common/filters/data-source-error.filter';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { AuthModule } from '@/routes/auth/auth.module';
 
 // See https://github.com/nestjs/nest/issues/11967
 export const configurationModule = ConfigurationModule.register(configuration);
@@ -63,6 +64,7 @@ export const configurationModule = ConfigurationModule.register(configuration);
     SafesModule,
     TransactionsModule,
     // common
+    AuthModule,
     CacheModule,
     // Module for storing and reading from the async local storage
     ClsModule.forRoot({
