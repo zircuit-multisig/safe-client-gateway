@@ -10,6 +10,7 @@
     "^.+\\.(t|j)s$": "ts-jest"
   },
   "coverageDirectory": "./coverage",
+  "coveragePathIgnorePatterns": ["src/datasources/db/migration.helper.js"],
   "moduleNameMapper": {
     "^@/(.*)$": "<rootDir>/src/$1"
   }

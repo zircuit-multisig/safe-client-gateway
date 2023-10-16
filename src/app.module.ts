@@ -9,7 +9,6 @@ import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { ClsMiddleware, ClsModule } from 'nestjs-cls';
 import { v4 as uuidv4 } from 'uuid';
 import { join } from 'path';
-
 import { ChainsModule } from '@/routes/chains/chains.module';
 import { BalancesModule } from '@/routes/balances/balances.module';
 import { NetworkModule } from '@/datasources/network/network.module';
@@ -41,6 +40,8 @@ import { DataSourceErrorFilter } from '@/routes/common/filters/data-source-error
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { RootModule } from '@/routes/root/root.module';
 import { AlertsModule } from '@/routes/alerts/alerts.module';
+import { EmailsModule } from '@/routes/emails/emails.module';
+import { EmailDatasourceModule } from '@/datasources/email/email.datasource.module';
 
 @Module({})
 export class AppModule implements NestModule {
@@ -67,6 +68,7 @@ export class AppModule implements NestModule {
         ContractsModule,
         DataDecodedModule,
         DelegatesModule,
+        EmailsModule,
         EstimationsModule,
         FlushModule,
         HealthModule,
@@ -89,6 +91,7 @@ export class AppModule implements NestModule {
         }),
         ConfigurationModule.register(configFactory),
         DomainModule,
+        EmailDatasourceModule,
         NetworkModule,
         RequestScopedLoggingModule,
         ServeStaticModule.forRoot({

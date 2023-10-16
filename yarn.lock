@@ -6433,6 +6433,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"postgres-shift@npm:^0.1.0":
+  version: 0.1.0
+  resolution: "postgres-shift@npm:0.1.0"
+  checksum: 1bfa9ac4479df2c0e2d8b0ecbc6e7b39c4ef990235c8200254fbd347bc08989cf0d078d378880656c14f5e20f18953a020d1ba58f85fc3973f99102aa455d0a1
+  languageName: node
+  linkType: hard
+
 "postgres@npm:^3.4.0":
   version: 3.4.0
   resolution: "postgres@npm:3.4.0"
@@ -6906,6 +6913,7 @@ __metadata:
     lodash: ^4.17.21
     nestjs-cls: ^3.6.0
     postgres: ^3.4.0
+    postgres-shift: ^0.1.0
     prettier: ^3.0.3
     redis: ^4.6.10
     reflect-metadata: ^0.1.13

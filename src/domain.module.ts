@@ -65,6 +65,8 @@ import { PricesRepository } from '@/domain/prices/prices.repository';
 import { SimpleBalancesValidator } from '@/domain/balances/simple-balances.validator';
 import { AssetPriceValidator } from '@/domain/prices/asset-price.validator';
 import { FiatCodesValidator } from '@/domain/prices/fiat-codes.validator';
+import { EmailModule } from '@/domain/email/email.module';
+import { EmailRepository } from '@/domain/email/email.repository';
 import { IAlertsRepository } from '@/domain/alerts/alerts.repository.interface';
 import { AlertsRepository } from '@/domain/alerts/alerts.repository';
 import { DelayModifierDecoder } from '@/domain/alerts/contracts/delay-modifier-decoder.helper';
@@ -75,6 +77,7 @@ import { SafeDecoder } from '@/domain/alerts/contracts/safe-decoder.helper';
   imports: [
     AlertsApiModule,
     ConfigApiModule,
+    EmailModule,
     ExchangeApiModule,
     PricesApiModule,
     HumanDescriptionApiModule,
@@ -113,6 +116,7 @@ import { SafeDecoder } from '@/domain/alerts/contracts/safe-decoder.helper';
     DataDecodedValidator,
     DelayModifierDecoder,
     DelegateValidator,
+    EmailRepository,
     EstimationsValidator,
     ExchangeFiatCodesValidator,
     ExchangeRatesValidator,
@@ -139,6 +143,7 @@ import { SafeDecoder } from '@/domain/alerts/contracts/safe-decoder.helper';
     IContractsRepository,
     IDataDecodedRepository,
     IDelegateRepository,
+    EmailRepository,
     IEstimationsRepository,
     IExchangeRepository,
     IFlushRepository,
