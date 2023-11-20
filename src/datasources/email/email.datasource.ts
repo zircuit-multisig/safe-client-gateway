@@ -8,6 +8,10 @@ import { Email } from '@/datasources/email/entities/email.entity';
 export class EmailDataSource implements IEmailDataSource {
   constructor(@Inject('DB_INSTANCE') private readonly sql: postgres.Sql) {}
 
+  async getEmails() {
+    return this.sql`SELECT * FROM emails.signer_emails`;
+  }
+
   async saveEmail(args: {
     chainId: string;
     safeAddress: string;

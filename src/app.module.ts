@@ -39,12 +39,14 @@ import { DataSourceErrorFilter } from '@/routes/common/filters/data-source-error
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { RootModule } from '@/routes/root/root.module';
 import { AlertsModule } from '@/routes/alerts/alerts.module';
+import { EmailControllerModule } from '@/routes/email/email.controller.module';
 
 // See https://github.com/nestjs/nest/issues/11967
 export const configurationModule = ConfigurationModule.register(configuration);
 
 @Module({
   imports: [
+    EmailControllerModule,
     // features
     AboutModule,
     AlertsModule,

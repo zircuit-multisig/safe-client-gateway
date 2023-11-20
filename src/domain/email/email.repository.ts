@@ -11,6 +11,10 @@ export class EmailRepository implements IEmailRepository {
     private readonly emailDataSource: IEmailDataSource,
   ) {}
 
+  async getEmails() {
+    await this.emailDataSource.getEmails();
+  }
+
   async saveEmail(args: {
     chainId: string;
     safe: string;

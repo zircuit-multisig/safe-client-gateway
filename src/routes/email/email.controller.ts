@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { EmailService } from '@/routes/email/email.service';
 import { EmailRegistrationGuard } from '@/routes/email/guards/email-registration.guard';
 import { TimestampGuard } from '@/routes/email/guards/timestamp.guard';
@@ -14,6 +14,11 @@ import { ApiExcludeController, ApiTags } from '@nestjs/swagger';
 @ApiExcludeController()
 export class EmailController {
   constructor(private readonly service: EmailService) {}
+
+  @Get('')
+  async getEmails() {
+    return this.service.getEmails();
+  }
 
   @Post('')
   @UseGuards(

@@ -1,6 +1,8 @@
 export const IEmailDataSource = Symbol('IEmailDataSource');
 
 export interface IEmailDataSource {
+  getEmails();
+
   /**
    * Saves an email entry in the respective data source.
    *

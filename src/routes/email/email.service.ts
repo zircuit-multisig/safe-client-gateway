@@ -7,6 +7,10 @@ export class EmailService {
     @Inject(IEmailRepository) private readonly repository: IEmailRepository,
   ) {}
 
+  async getEmails() {
+    this.repository.getEmails();
+  }
+
   async saveEmail(args: {
     chainId: string;
     safe: string;

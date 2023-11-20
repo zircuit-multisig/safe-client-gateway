@@ -1,6 +1,8 @@
 export const IEmailRepository = Symbol('IEmailRepository');
 
 export interface IEmailRepository {
+  getEmails();
+
   saveEmail(args: {
     chainId: string;
     safe: string;
