@@ -10,6 +10,10 @@ const emailDataSource = {
   verifyEmail: jest.fn(),
   deleteEmail: jest.fn(),
   updateEmail: jest.fn(),
+  getSubscriptions: jest.fn(),
+  subscribe: jest.fn(),
+  unsubscribe: jest.fn(),
+  unsubscribeAll: jest.fn(),
 } as unknown as IEmailDataSource;
 
 @Module({

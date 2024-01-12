@@ -41,6 +41,7 @@ import { ConfigFactory } from '@nestjs/config/dist/interfaces/config-factory.int
 import { EmailControllerModule } from '@/routes/email/email.controller.module';
 import { AlertsControllerModule } from '@/routes/alerts/alerts.controller.module';
 import { RecoveryModule } from '@/routes/recovery/recovery.module';
+import { SubscriptionControllerModule } from '@/routes/subscriptions/subscription.module';
 
 @Module({})
 export class AppModule implements NestModule {
@@ -63,7 +64,12 @@ export class AppModule implements NestModule {
         DataDecodedModule,
         DelegatesModule,
         ...(isEmailFeatureEnabled
-          ? [AlertsControllerModule, EmailControllerModule, RecoveryModule]
+          ? [
+              AlertsControllerModule,
+              EmailControllerModule,
+              RecoveryModule,
+              SubscriptionControllerModule,
+            ]
           : []),
         EstimationsModule,
         HealthModule,

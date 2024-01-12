@@ -98,6 +98,10 @@ describe('Email controller save email tests', () => {
       email: emailAddress,
       verificationCode: faker.string.numeric(),
     });
+    emailDatasource.subscribe.mockResolvedValue({
+      key: faker.word.sample(),
+      name: faker.word.words(2),
+    });
 
     await request(app.getHttpServer())
       .post(`/v1/chains/${chain.chainId}/safes/${safe.address}/emails`)
@@ -118,6 +122,12 @@ describe('Email controller save email tests', () => {
         'email.templates.verificationCode',
       ),
       to: [emailAddress],
+    });
+    expect(emailDatasource.subscribe).toHaveBeenCalledWith({
+      chainId: chain.chainId,
+      safeAddress: safe.address,
+      account: accountAddress,
+      categoryKey: 'account_recovery',
     });
   });
 
