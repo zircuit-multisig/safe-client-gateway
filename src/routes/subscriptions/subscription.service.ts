@@ -9,6 +9,15 @@ export class SubscriptionService {
     private readonly repository: SubscriptionRepository,
   ) {}
 
+  async subscribe(args: {
+    chainId: string;
+    safeAddress: string;
+    account: string;
+    categoryKey: string;
+  }): Promise<void> {
+    await this.repository.subscribe(args);
+  }
+
   async unsubscribe(args: {
     categoryKey: string;
     token: string;
