@@ -28,6 +28,7 @@ import { EmailEditGuard } from '@/routes/email/guards/email-edit.guard';
 import { EmailEditMatchesExceptionFilter } from '@/routes/email/exception-filters/email-edit-matches.exception-filter';
 import { EmailRetrievalGuard } from '@/routes/email/guards/email-retrieval.guard';
 import { Email } from '@/routes/email/entities/email.entity';
+import { EmailPublicState } from '@/routes/email/entities/email-public-state.entity';
 
 @ApiTags('email')
 @Controller({
@@ -50,6 +51,19 @@ export class EmailController {
     @Param('signer') signer: string,
   ): Promise<Email> {
     return this.service.getEmail({
+      chainId,
+      safeAddress,
+      signer,
+    });
+  }
+
+  @Get(':signer/public')
+  async getEmailPublic(
+    @Param('chainId') chainId: string,
+    @Param('safeAddress') safeAddress: string,
+    @Param('signer') signer: string,
+  ): Promise<EmailPublicState> {
+    return this.service.getEmailPublicState({
       chainId,
       safeAddress,
       signer,

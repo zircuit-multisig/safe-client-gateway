@@ -1,6 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { IAccountRepository } from '@/domain/account/account.repository.interface';
 import { Email } from '@/routes/email/entities/email.entity';
+import { EmailPublicState } from '@/routes/email/entities/email-public-state.entity';
+import { AccountDoesNotExistError } from '@/domain/account/errors/account-does-not-exist.error';
 
 @Injectable()
 export class EmailService {
@@ -58,5 +60,21 @@ export class EmailService {
   }): Promise<Email> {
     const account = await this.repository.getAccount(args);
     return new Email(account.emailAddress.value, account.isVerified);
+  }
+
+  async getEmailPublicState(args: {
+    chainId: string;
+    safeAddress: string;
+    signer: string;
+  }): Promise<EmailPublicState> {
+    try {
+      const account = await this.repository.getAccount(args);
+      return new EmailPublicState(account.isVerified);
+    } catch (error) {
+      if (error instanceof AccountDoesNotExistError) {
+        return new EmailPublicState(false);
+      }
+      throw error;
+    }
   }
 }
