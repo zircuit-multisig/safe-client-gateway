@@ -44,6 +44,7 @@ import { RelayControllerModule } from '@/routes/relay/relay.controller.module';
 import { SubscriptionControllerModule } from '@/routes/subscriptions/subscription.module';
 import { LockingModule } from '@/routes/locking/locking.module';
 import { ZodErrorFilter } from '@/routes/common/filters/zod-error.filter';
+import { BullModule } from '@nestjs/bull';
 
 @Module({})
 export class AppModule implements NestModule {
@@ -110,6 +111,12 @@ export class AppModule implements NestModule {
           exclude: ['/(.*)'],
         }),
         ValidationModule,
+        BullModule.forRoot({
+          redis: {
+            host: configFactory().redis.host,
+            port: Number(configFactory().redis.port),
+          },
+        }),
       ],
       providers: [
         {

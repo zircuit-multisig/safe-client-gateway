@@ -14,6 +14,8 @@ import { Event } from '@/routes/cache-hooks/entities/event.entity';
 import { PreExecutionLogGuard } from '@/routes/cache-hooks/guards/pre-execution.guard';
 import { WebHookSchema } from '@/routes/cache-hooks/entities/schemas/web-hook.schema';
 import { ILoggingService, LoggingService } from '@/logging/logging.interface';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bullmq';
 
 @Controller({
   path: '',
@@ -24,6 +26,7 @@ export class CacheHooksController {
   constructor(
     private readonly service: CacheHooksService,
     @Inject(LoggingService) private readonly loggingService: ILoggingService,
+    @InjectQueue('cache-hooks') private readonly queue: Queue<Event>,
   ) {}
 
   @UseGuards(PreExecutionLogGuard, BasicAuthGuard)
@@ -32,6 +35,7 @@ export class CacheHooksController {
   async postEvent(
     @Body(new ValidationPipe(WebHookSchema)) event: Event,
   ): Promise<void> {
+    await this.queue.add('test', event);
     this.service.onEvent(event).catch((error) => {
       this.loggingService.error(error);
     });
