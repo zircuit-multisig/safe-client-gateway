@@ -1,11 +1,12 @@
-import { Body, Controller, Get, Post, HttpCode } from '@nestjs/common';
+import { Body, Controller, Get, Post, HttpCode, Inject } from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
 import { ValidationPipe } from '@/validation/pipes/validation.pipe';
 import { AuthService } from '@/routes/auth/auth.service';
 import {
   VerifyAuthMessageDto,
-  VerifyAuthMessageDtoSchema,
+  getVerifyAuthMessageDtoSchema,
 } from '@/routes/auth/entities/verify-auth-message.dto.entity';
+import { IConfigurationService } from '@/config/configuration.service.interface';
 
 /**
  * The AuthController is responsible for handling authentication:
@@ -20,7 +21,18 @@ import {
 @Controller({ path: 'auth', version: '1' })
 @ApiExcludeController()
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  private readonly maxValidityPeriodInSeconds: number;
+
+  constructor(
+    private readonly authService: AuthService,
+    @Inject(IConfigurationService)
+    private readonly configurationService: IConfigurationService,
+  ) {
+    this.maxValidityPeriodInSeconds =
+      this.configurationService.getOrThrow<number>(
+        'auth.maxValidityPeriodInSeconds',
+      );
+  }
 
   @Get('nonce')
   async getNonce(): Promise<{
@@ -32,7 +44,11 @@ export class AuthController {
   @HttpCode(200)
   @Post('verify')
   async verify(
-    @Body(new ValidationPipe(VerifyAuthMessageDtoSchema))
+    @Body(
+      new ValidationPipe(
+        getVerifyAuthMessageDtoSchema(this.maxValidityPeriodInSeconds),
+      ),
+    )
     verifyAuthMessageDto: VerifyAuthMessageDto,
   ): Promise<{
     accessToken: string;

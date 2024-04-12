@@ -10,6 +10,7 @@ export default (): ReturnType<typeof configuration> => ({
   applicationPort: faker.internet.port().toString(),
   auth: {
     token: faker.string.hexadecimal({ length: 32 }),
+    maxValidityPeriodInSeconds: faker.number.int(),
     nonceTtlSeconds: faker.number.int(),
   },
   balances: {

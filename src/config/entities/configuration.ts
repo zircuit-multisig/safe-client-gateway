@@ -9,6 +9,9 @@ export default () => ({
   applicationPort: process.env.APPLICATION_PORT || '3000',
   auth: {
     token: process.env.AUTH_TOKEN,
+    maxValidityPeriodInSeconds: parseInt(
+      process.env.AUTH_MAX_VALIDITY_PERIOD_SECONDS ?? `${15 * 60}`,
+    ),
     nonceTtlSeconds: parseInt(
       process.env.AUTH_NONCE_TTL_SECONDS ?? `${5 * 60}`,
     ),
