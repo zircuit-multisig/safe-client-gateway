@@ -1,5 +1,5 @@
-import { HttpStatus, PipeTransform } from '@nestjs/common';
-import { ZodError, ZodIssue, ZodSchema, z } from 'zod';
+import { HttpStatus, Inject, Injectable, PipeTransform } from '@nestjs/common';
+import { z, ZodError, ZodIssue, ZodSchema } from 'zod';
 
 export class ZodErrorWithCode extends ZodError {
   constructor(
@@ -10,10 +10,11 @@ export class ZodErrorWithCode extends ZodError {
   }
 }
 
+@Injectable()
 export class ValidationPipe<T extends ZodSchema> implements PipeTransform {
   constructor(
-    private schema: T,
-    private code = HttpStatus.UNPROCESSABLE_ENTITY,
+    @Inject('VALIDATION_SCHEMA') private schema: T,
+    @Inject('VALIDATION_CODE') private code = HttpStatus.UNPROCESSABLE_ENTITY,
   ) {}
 
   transform(value: unknown): z.infer<T> {

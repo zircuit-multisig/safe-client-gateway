@@ -1,11 +1,8 @@
-import { Body, Controller, Get, Post, HttpCode, Inject } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Inject, Post } from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
 import { ValidationPipe } from '@/validation/pipes/validation.pipe';
 import { AuthService } from '@/routes/auth/auth.service';
-import {
-  VerifyAuthMessageDto,
-  getVerifyAuthMessageDtoSchema,
-} from '@/routes/auth/entities/verify-auth-message.dto.entity';
+import { VerifyAuthMessageDto } from '@/routes/auth/entities/verify-auth-message.dto.entity';
 import { IConfigurationService } from '@/config/configuration.service.interface';
 
 /**
@@ -44,11 +41,7 @@ export class AuthController {
   @HttpCode(200)
   @Post('verify')
   async verify(
-    @Body(
-      new ValidationPipe(
-        getVerifyAuthMessageDtoSchema(this.maxValidityPeriodInSeconds),
-      ),
-    )
+    @Body(ValidationPipe)
     verifyAuthMessageDto: VerifyAuthMessageDto,
   ): Promise<{
     accessToken: string;
