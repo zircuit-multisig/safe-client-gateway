@@ -2,7 +2,7 @@ import { Global, Inject, Module } from '@nestjs/common';
 import { IConfigurationService } from '@/config/configuration.service.interface';
 import { ILoggingService, LoggingService } from '@/logging/logging.interface';
 
-class TestLoggingService implements ILoggingService {
+export class TestLoggingService implements ILoggingService {
   private readonly isSilent: boolean;
 
   constructor(
