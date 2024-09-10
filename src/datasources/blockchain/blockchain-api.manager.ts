@@ -8,6 +8,7 @@ import { Chain, PublicClient, createPublicClient, http } from 'viem';
 
 @Injectable()
 export class BlockchainApiManager implements IBlockchainApiManager {
+  private static readonly INFURA_URL_PATTERN = 'infura';
   private readonly blockchainApiMap: Record<string, PublicClient> = {};
   private readonly infuraApiKey: string;
 
@@ -21,7 +22,7 @@ export class BlockchainApiManager implements IBlockchainApiManager {
     );
   }
 
-  async getBlockchainApi(chainId: string): Promise<PublicClient> {
+  async getApi(chainId: string): Promise<PublicClient> {
     const blockchainApi = this.blockchainApiMap[chainId];
     if (blockchainApi) {
       return blockchainApi;
@@ -33,7 +34,7 @@ export class BlockchainApiManager implements IBlockchainApiManager {
     return this.blockchainApiMap[chainId];
   }
 
-  destroyBlockchainApi(chainId: string): void {
+  destroyApi(chainId: string): void {
     if (this.blockchainApiMap?.[chainId]) {
       delete this.blockchainApiMap[chainId];
     }
@@ -59,9 +60,15 @@ export class BlockchainApiManager implements IBlockchainApiManager {
     };
   }
 
-  // Note: this assumes Infura as provider when using an API key as authentication method.
+  /**
+   * Formats rpcUri to include the Infura API key if the rpcUri is an Infura URL
+   * and the authentication method is {@link RpcUriAuthentication.ApiKeyPath}.
+   * @param rpcUri rpcUri to format
+   * @returns Formatted rpcUri
+   */
   private formatRpcUri(rpcUri: DomainChain['rpcUri']): string {
-    return rpcUri.authentication === RpcUriAuthentication.ApiKeyPath
+    return rpcUri.authentication === RpcUriAuthentication.ApiKeyPath &&
+      rpcUri.value.includes(BlockchainApiManager.INFURA_URL_PATTERN)
       ? rpcUri.value + this.infuraApiKey
       : rpcUri.value;
   }

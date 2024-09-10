@@ -18,8 +18,6 @@ import { RequestScopedLoggingModule } from '@/logging/logging.module';
 import { addRecoveryModuleDtoBuilder } from '@/routes/recovery/entities/__tests__/add-recovery-module.dto.builder';
 import configuration from '@/config/entities/__tests__/configuration';
 import { NetworkResponseError } from '@/datasources/network/entities/network.error.entity';
-import { AccountDataSourceModule } from '@/datasources/account/account.datasource.module';
-import { TestAccountDataSourceModule } from '@/datasources/account/__tests__/test.account.datasource.module';
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 import { safeBuilder } from '@/domain/safe/entities/__tests__/safe.builder';
 import { chainBuilder } from '@/domain/chains/entities/__tests__/chain.builder';
@@ -42,7 +40,6 @@ import { TestQueuesApiModule } from '@/datasources/queues/__tests__/test.queues-
 import { QueuesApiModule } from '@/datasources/queues/queues-api.module';
 import { authPayloadDtoBuilder } from '@/domain/auth/entities/__tests__/auth-payload-dto.entity.builder';
 import { IJwtService } from '@/datasources/jwt/jwt.service.interface';
-import { getSecondsUntil } from '@/domain/common/utils/time';
 import { getAddress } from 'viem';
 import { Server } from 'net';
 
@@ -73,8 +70,6 @@ describe('Recovery (Unit)', () => {
     })
       .overrideModule(JWT_CONFIGURATION_MODULE)
       .useModule(JwtConfigurationModule.register(jwtConfiguration))
-      .overrideModule(AccountDataSourceModule)
-      .useModule(TestAccountDataSourceModule)
       .overrideModule(ALERTS_CONFIGURATION_MODULE)
       .useModule(AlertsConfigurationModule.register(alertsConfiguration))
       .overrideModule(ALERTS_API_CONFIGURATION_MODULE)
@@ -197,9 +192,9 @@ describe('Recovery (Unit)', () => {
         .with('chain_id', chain.chainId)
         .with('signer_address', signerAddress)
         .build();
-      const notBefore = faker.date.future();
-      const accessToken = jwtService.sign(authPayloadDto, {
-        notBefore: getSecondsUntil(notBefore),
+      const accessToken = jwtService.sign({
+        ...authPayloadDto,
+        nbf: faker.date.future(),
       });
 
       expect(() => jwtService.verify(accessToken)).toThrow('jwt not active');
@@ -222,8 +217,9 @@ describe('Recovery (Unit)', () => {
         .with('chain_id', chain.chainId)
         .with('signer_address', signerAddress)
         .build();
-      const accessToken = jwtService.sign(authPayloadDto, {
-        expiresIn: 0, // Now
+      const accessToken = jwtService.sign({
+        ...authPayloadDto,
+        exp: new Date(), // Now
       });
       jest.advanceTimersByTime(1_000);
 
@@ -552,9 +548,9 @@ describe('Recovery (Unit)', () => {
         .with('chain_id', chain.chainId)
         .with('signer_address', signerAddress)
         .build();
-      const notBefore = faker.date.future();
-      const accessToken = jwtService.sign(authPayloadDto, {
-        notBefore: getSecondsUntil(notBefore),
+      const accessToken = jwtService.sign({
+        ...authPayloadDto,
+        nbf: faker.date.future(),
       });
 
       expect(() => jwtService.verify(accessToken)).toThrow('jwt not active');
@@ -578,8 +574,9 @@ describe('Recovery (Unit)', () => {
         .with('chain_id', chain.chainId)
         .with('signer_address', signerAddress)
         .build();
-      const accessToken = jwtService.sign(authPayloadDto, {
-        expiresIn: 0, // Now
+      const accessToken = jwtService.sign({
+        ...authPayloadDto,
+        exp: new Date(), // Now
       });
       jest.advanceTimersByTime(1_000);
 

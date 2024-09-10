@@ -6,8 +6,6 @@ import { TestAppProvider } from '@/__tests__/test-app.provider';
 import { AppModule } from '@/app.module';
 import { IConfigurationService } from '@/config/configuration.service.interface';
 import configuration from '@/config/entities/__tests__/configuration';
-import { TestAccountDataSourceModule } from '@/datasources/account/__tests__/test.account.datasource.module';
-import { AccountDataSourceModule } from '@/datasources/account/account.datasource.module';
 import { TestCacheModule } from '@/datasources/cache/__tests__/test.cache.module';
 import { CacheModule } from '@/datasources/cache/cache.module';
 import { TestNetworkModule } from '@/datasources/network/__tests__/test.network.module';
@@ -35,6 +33,7 @@ import { TestQueuesApiModule } from '@/datasources/queues/__tests__/test.queues-
 import { QueuesApiModule } from '@/datasources/queues/queues-api.module';
 import { Server } from 'net';
 import { sample } from 'lodash';
+import { balancesProviderBuilder } from '@/domain/chains/entities/__tests__/balances-provider.builder';
 
 describe('Balances Controller (Unit)', () => {
   let app: INestApplication<Server>;
@@ -71,8 +70,6 @@ describe('Balances Controller (Unit)', () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule.register(testConfiguration)],
     })
-      .overrideModule(AccountDataSourceModule)
-      .useModule(TestAccountDataSourceModule)
       .overrideModule(CacheModule)
       .useModule(TestCacheModule)
       .overrideModule(RequestScopedLoggingModule)
@@ -108,12 +105,16 @@ describe('Balances Controller (Unit)', () => {
   describe('Balances provider: Zerion', () => {
     describe('GET /balances', () => {
       it(`maps native coin + ERC20 token balance correctly, and sorts balances by fiatBalance`, async () => {
-        const chain = chainBuilder().with('chainId', zerionChainIds[0]).build();
+        const chainName = faker.company.name();
+        const chain = chainBuilder()
+          .with('chainId', zerionChainIds[0])
+          .with(
+            'balancesProvider',
+            balancesProviderBuilder().with('chainName', chainName).build(),
+          )
+          .build();
         const safeAddress = getAddress(faker.finance.ethereumAddress());
         const currency = sample(zerionCurrencies);
-        const chainName = configurationService.getOrThrow<string>(
-          `balances.providers.zerion.chains.${chain.chainId}.chainName`,
-        );
         const nativeCoinFungibleInfo = zerionFungibleInfoBuilder()
           .with('implementations', [
             zerionImplementationBuilder().build(),
@@ -254,12 +255,16 @@ describe('Balances Controller (Unit)', () => {
       });
 
       it('returns large numbers as is (not in scientific notation)', async () => {
-        const chain = chainBuilder().with('chainId', zerionChainIds[0]).build();
+        const chainName = faker.company.name();
+        const chain = chainBuilder()
+          .with('chainId', zerionChainIds[0])
+          .with(
+            'balancesProvider',
+            balancesProviderBuilder().with('chainName', chainName).build(),
+          )
+          .build();
         const safeAddress = getAddress(faker.finance.ethereumAddress());
         const currency = sample(zerionCurrencies);
-        const chainName = configurationService.getOrThrow<string>(
-          `balances.providers.zerion.chains.${chain.chainId}.chainName`,
-        );
         const nativeCoinFungibleInfo = zerionFungibleInfoBuilder()
           .with('implementations', [
             zerionImplementationBuilder().build(),
@@ -497,12 +502,16 @@ describe('Balances Controller (Unit)', () => {
 
     describe('Rate Limit error', () => {
       it('does not trigger a rate-limit error', async () => {
-        const chain = chainBuilder().with('chainId', zerionChainIds[0]).build();
+        const chainName = faker.company.name();
+        const chain = chainBuilder()
+          .with('chainId', zerionChainIds[0])
+          .with(
+            'balancesProvider',
+            balancesProviderBuilder().with('chainName', chainName).build(),
+          )
+          .build();
         const safeAddress = getAddress(faker.finance.ethereumAddress());
         const currency = sample(zerionCurrencies);
-        const chainName = configurationService.getOrThrow<string>(
-          `balances.providers.zerion.chains.${chain.chainId}.chainName`,
-        );
         const nativeCoinFungibleInfo = zerionFungibleInfoBuilder()
           .with('implementations', [
             zerionImplementationBuilder()
@@ -566,11 +575,15 @@ describe('Balances Controller (Unit)', () => {
       });
 
       it('triggers a rate-limit error', async () => {
-        const chain = chainBuilder().with('chainId', zerionChainIds[0]).build();
+        const chainName = faker.company.name();
+        const chain = chainBuilder()
+          .with('chainId', zerionChainIds[0])
+          .with(
+            'balancesProvider',
+            balancesProviderBuilder().with('chainName', chainName).build(),
+          )
+          .build();
         const safeAddress = getAddress(faker.finance.ethereumAddress());
-        const chainName = configurationService.getOrThrow<string>(
-          `balances.providers.zerion.chains.${chain.chainId}.chainName`,
-        );
         const nativeCoinFungibleInfo = zerionFungibleInfoBuilder()
           .with('implementations', [
             zerionImplementationBuilder()

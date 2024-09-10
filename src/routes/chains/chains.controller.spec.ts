@@ -26,8 +26,6 @@ import { Page } from '@/domain/entities/page.entity';
 import { TestLoggingModule } from '@/logging/__tests__/test.logging.module';
 import { RequestScopedLoggingModule } from '@/logging/logging.module';
 import { PaginationData } from '@/routes/common/pagination/pagination.data';
-import { AccountDataSourceModule } from '@/datasources/account/account.datasource.module';
-import { TestAccountDataSourceModule } from '@/datasources/account/__tests__/test.account.datasource.module';
 import { getAddress } from 'viem';
 import { TestQueuesApiModule } from '@/datasources/queues/__tests__/test.queues-api.module';
 import { QueuesApiModule } from '@/datasources/queues/queues-api.module';
@@ -58,8 +56,6 @@ describe('Chains Controller (Unit)', () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule.register(configuration)],
     })
-      .overrideModule(AccountDataSourceModule)
-      .useModule(TestAccountDataSourceModule)
       .overrideModule(CacheModule)
       .useModule(TestCacheModule)
       .overrideModule(RequestScopedLoggingModule)
@@ -120,6 +116,8 @@ describe('Chains Controller (Unit)', () => {
               ),
               disabledWallets: chainsResponse.results[0].disabledWallets,
               features: chainsResponse.results[0].features,
+              balancesProvider: chainsResponse.results[0].balancesProvider,
+              contractAddresses: chainsResponse.results[0].contractAddresses,
             },
             {
               chainId: chainsResponse.results[1].chainId,
@@ -143,6 +141,8 @@ describe('Chains Controller (Unit)', () => {
               ),
               disabledWallets: chainsResponse.results[1].disabledWallets,
               features: chainsResponse.results[1].features,
+              balancesProvider: chainsResponse.results[1].balancesProvider,
+              contractAddresses: chainsResponse.results[1].contractAddresses,
             },
           ],
         });
@@ -238,6 +238,8 @@ describe('Chains Controller (Unit)', () => {
         ensRegistryAddress: chainDomain.ensRegistryAddress
           ? getAddress(chainDomain.ensRegistryAddress)
           : chainDomain.ensRegistryAddress,
+        balancesProvider: chainDomain.balancesProvider,
+        contractAddresses: chainDomain.contractAddresses,
       };
       networkService.get.mockResolvedValueOnce({
         data: chainDomain,

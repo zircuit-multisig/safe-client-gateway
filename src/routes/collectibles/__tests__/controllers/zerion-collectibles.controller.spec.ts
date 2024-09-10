@@ -6,8 +6,6 @@ import { TestAppProvider } from '@/__tests__/test-app.provider';
 import { AppModule } from '@/app.module';
 import { IConfigurationService } from '@/config/configuration.service.interface';
 import configuration from '@/config/entities/__tests__/configuration';
-import { TestAccountDataSourceModule } from '@/datasources/account/__tests__/test.account.datasource.module';
-import { AccountDataSourceModule } from '@/datasources/account/account.datasource.module';
 import { TestCacheModule } from '@/datasources/cache/__tests__/test.cache.module';
 import { CacheModule } from '@/datasources/cache/cache.module';
 import { TestNetworkModule } from '@/datasources/network/__tests__/test.network.module';
@@ -29,9 +27,11 @@ import { getAddress } from 'viem';
 import { TestQueuesApiModule } from '@/datasources/queues/__tests__/test.queues-api.module';
 import { QueuesApiModule } from '@/datasources/queues/queues-api.module';
 import { Server } from 'net';
+import { balancesProviderBuilder } from '@/domain/chains/entities/__tests__/balances-provider.builder';
 
 describe('Zerion Collectibles Controller', () => {
   let app: INestApplication<Server>;
+  let safeConfigUrl: string;
   let networkService: jest.MockedObjectDeep<INetworkService>;
   let zerionBaseUri: string;
   let zerionChainIds: string[];
@@ -42,8 +42,6 @@ describe('Zerion Collectibles Controller', () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule.register(configuration)],
     })
-      .overrideModule(AccountDataSourceModule)
-      .useModule(TestAccountDataSourceModule)
       .overrideModule(CacheModule)
       .useModule(TestCacheModule)
       .overrideModule(RequestScopedLoggingModule)
@@ -57,6 +55,7 @@ describe('Zerion Collectibles Controller', () => {
     const configurationService = moduleFixture.get<IConfigurationService>(
       IConfigurationService,
     );
+    safeConfigUrl = configurationService.getOrThrow('safeConfig.baseUri');
     zerionBaseUri = configurationService.getOrThrow(
       'balances.providers.zerion.baseUri',
     );
@@ -76,7 +75,14 @@ describe('Zerion Collectibles Controller', () => {
   describe('Collectibles provider: Zerion', () => {
     describe('GET /v2/collectibles', () => {
       it('successfully gets collectibles from Zerion', async () => {
-        const chain = chainBuilder().with('chainId', zerionChainIds[0]).build();
+        const chainName = faker.company.name();
+        const chain = chainBuilder()
+          .with('chainId', zerionChainIds[0])
+          .with(
+            'balancesProvider',
+            balancesProviderBuilder().with('chainName', chainName).build(),
+          )
+          .build();
         const safeAddress = getAddress(faker.finance.ethereumAddress());
         const aTokenAddress = getAddress(faker.finance.ethereumAddress());
         const aNFTName = faker.string.sample();
@@ -126,16 +132,13 @@ describe('Zerion Collectibles Controller', () => {
               .build(),
           ])
           .build();
-        const chainName = app
-          .get<IConfigurationService>(IConfigurationService)
-          .getOrThrow(
-            `balances.providers.zerion.chains.${chain.chainId}.chainName`,
-          );
         const apiKey = app
           .get<IConfigurationService>(IConfigurationService)
           .getOrThrow(`balances.providers.zerion.apiKey`);
         networkService.get.mockImplementation(({ url }) => {
           switch (url) {
+            case `${safeConfigUrl}/api/v1/chains/${chain.chainId}`:
+              return Promise.resolve({ data: chain, status: 200 });
             case `${zerionBaseUri}/v1/wallets/${safeAddress}/nft-positions`:
               return Promise.resolve({
                 data: zerionApiCollectiblesResponse,
@@ -240,12 +243,15 @@ describe('Zerion Collectibles Controller', () => {
             });
           });
 
-        expect(networkService.get.mock.calls.length).toBe(1);
+        expect(networkService.get.mock.calls.length).toBe(2);
         expect(networkService.get.mock.calls[0][0].url).toBe(
+          `${safeConfigUrl}/api/v1/chains/${chain.chainId}`,
+        );
+        expect(networkService.get.mock.calls[1][0].url).toBe(
           `${zerionBaseUri}/v1/wallets/${safeAddress}/nft-positions`,
         );
         expect(
-          networkService.get.mock.calls[0][0].networkRequest,
+          networkService.get.mock.calls[1][0].networkRequest,
         ).toStrictEqual({
           headers: { Authorization: `Basic ${apiKey}` },
           params: {
@@ -255,8 +261,16 @@ describe('Zerion Collectibles Controller', () => {
           },
         });
       });
+
       it('successfully maps pagination option (no limit)', async () => {
-        const chain = chainBuilder().with('chainId', zerionChainIds[0]).build();
+        const chainName = faker.company.name();
+        const chain = chainBuilder()
+          .with('chainId', zerionChainIds[0])
+          .with(
+            'balancesProvider',
+            balancesProviderBuilder().with('chainName', chainName).build(),
+          )
+          .build();
         const safeAddress = getAddress(faker.finance.ethereumAddress());
         const inputPaginationCursor = `cursor=${encodeURIComponent(`&offset=10`)}`;
         const zerionNext = `${faker.internet.url({ appendSlash: false })}?page%5Bsize%5D=20&page%5Bafter%5D=IjMwIg==`;
@@ -268,16 +282,13 @@ describe('Zerion Collectibles Controller', () => {
           ])
           .with('links', { next: zerionNext })
           .build();
-        const chainName = app
-          .get<IConfigurationService>(IConfigurationService)
-          .getOrThrow(
-            `balances.providers.zerion.chains.${chain.chainId}.chainName`,
-          );
         const apiKey = app
           .get<IConfigurationService>(IConfigurationService)
           .getOrThrow(`balances.providers.zerion.apiKey`);
         networkService.get.mockImplementation(({ url }) => {
           switch (url) {
+            case `${safeConfigUrl}/api/v1/chains/${chain.chainId}`:
+              return Promise.resolve({ data: chain, status: 200 });
             case `${zerionBaseUri}/v1/wallets/${safeAddress}/nft-positions`:
               return Promise.resolve({
                 data: zerionApiCollectiblesResponse,
@@ -302,12 +313,15 @@ describe('Zerion Collectibles Controller', () => {
             });
           });
 
-        expect(networkService.get.mock.calls.length).toBe(1);
+        expect(networkService.get.mock.calls.length).toBe(2);
         expect(networkService.get.mock.calls[0][0].url).toBe(
+          `${safeConfigUrl}/api/v1/chains/${chain.chainId}`,
+        );
+        expect(networkService.get.mock.calls[1][0].url).toBe(
           `${zerionBaseUri}/v1/wallets/${safeAddress}/nft-positions`,
         );
         expect(
-          networkService.get.mock.calls[0][0].networkRequest,
+          networkService.get.mock.calls[1][0].networkRequest,
         ).toStrictEqual({
           headers: { Authorization: `Basic ${apiKey}` },
           params: {
@@ -320,7 +334,14 @@ describe('Zerion Collectibles Controller', () => {
       });
 
       it('successfully maps pagination option (no offset)', async () => {
-        const chain = chainBuilder().with('chainId', zerionChainIds[0]).build();
+        const chainName = faker.company.name();
+        const chain = chainBuilder()
+          .with('chainId', zerionChainIds[0])
+          .with(
+            'balancesProvider',
+            balancesProviderBuilder().with('chainName', chainName).build(),
+          )
+          .build();
         const safeAddress = getAddress(faker.finance.ethereumAddress());
         const paginationLimit = 4;
         const inputPaginationCursor = `cursor=${encodeURIComponent(`limit=${paginationLimit}`)}`;
@@ -333,16 +354,13 @@ describe('Zerion Collectibles Controller', () => {
           ])
           .with('links', { next: zerionNext })
           .build();
-        const chainName = app
-          .get<IConfigurationService>(IConfigurationService)
-          .getOrThrow(
-            `balances.providers.zerion.chains.${chain.chainId}.chainName`,
-          );
         const apiKey = app
           .get<IConfigurationService>(IConfigurationService)
           .getOrThrow(`balances.providers.zerion.apiKey`);
         networkService.get.mockImplementation(({ url }) => {
           switch (url) {
+            case `${safeConfigUrl}/api/v1/chains/${chain.chainId}`:
+              return Promise.resolve({ data: chain, status: 200 });
             case `${zerionBaseUri}/v1/wallets/${safeAddress}/nft-positions`:
               return Promise.resolve({
                 data: zerionApiCollectiblesResponse,
@@ -367,12 +385,15 @@ describe('Zerion Collectibles Controller', () => {
             });
           });
 
-        expect(networkService.get.mock.calls.length).toBe(1);
+        expect(networkService.get.mock.calls.length).toBe(2);
         expect(networkService.get.mock.calls[0][0].url).toBe(
+          `${safeConfigUrl}/api/v1/chains/${chain.chainId}`,
+        );
+        expect(networkService.get.mock.calls[1][0].url).toBe(
           `${zerionBaseUri}/v1/wallets/${safeAddress}/nft-positions`,
         );
         expect(
-          networkService.get.mock.calls[0][0].networkRequest,
+          networkService.get.mock.calls[1][0].networkRequest,
         ).toStrictEqual({
           headers: { Authorization: `Basic ${apiKey}` },
           params: {
@@ -384,7 +405,14 @@ describe('Zerion Collectibles Controller', () => {
       });
 
       it('successfully maps pagination option (both limit and offset)', async () => {
-        const chain = chainBuilder().with('chainId', zerionChainIds[0]).build();
+        const chainName = faker.company.name();
+        const chain = chainBuilder()
+          .with('chainId', zerionChainIds[0])
+          .with(
+            'balancesProvider',
+            balancesProviderBuilder().with('chainName', chainName).build(),
+          )
+          .build();
         const safeAddress = getAddress(faker.finance.ethereumAddress());
         const paginationLimit = 4;
         const inputPaginationCursor = `cursor=${encodeURIComponent(`limit=${paginationLimit}&offset=20`)}`;
@@ -397,16 +425,13 @@ describe('Zerion Collectibles Controller', () => {
           ])
           .with('links', { next: zerionNext })
           .build();
-        const chainName = app
-          .get<IConfigurationService>(IConfigurationService)
-          .getOrThrow(
-            `balances.providers.zerion.chains.${chain.chainId}.chainName`,
-          );
         const apiKey = app
           .get<IConfigurationService>(IConfigurationService)
           .getOrThrow(`balances.providers.zerion.apiKey`);
         networkService.get.mockImplementation(({ url }) => {
           switch (url) {
+            case `${safeConfigUrl}/api/v1/chains/${chain.chainId}`:
+              return Promise.resolve({ data: chain, status: 200 });
             case `${zerionBaseUri}/v1/wallets/${safeAddress}/nft-positions`:
               return Promise.resolve({
                 data: zerionApiCollectiblesResponse,
@@ -431,12 +456,15 @@ describe('Zerion Collectibles Controller', () => {
             });
           });
 
-        expect(networkService.get.mock.calls.length).toBe(1);
+        expect(networkService.get.mock.calls.length).toBe(2);
         expect(networkService.get.mock.calls[0][0].url).toBe(
+          `${safeConfigUrl}/api/v1/chains/${chain.chainId}`,
+        );
+        expect(networkService.get.mock.calls[1][0].url).toBe(
           `${zerionBaseUri}/v1/wallets/${safeAddress}/nft-positions`,
         );
         expect(
-          networkService.get.mock.calls[0][0].networkRequest,
+          networkService.get.mock.calls[1][0].networkRequest,
         ).toStrictEqual({
           headers: { Authorization: `Basic ${apiKey}` },
           params: {

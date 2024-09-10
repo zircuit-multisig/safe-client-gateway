@@ -18,8 +18,6 @@ import {
   INetworkService,
   NetworkService,
 } from '@/datasources/network/network.service.interface';
-import { AccountDataSourceModule } from '@/datasources/account/account.datasource.module';
-import { TestAccountDataSourceModule } from '@/datasources/account/__tests__/test.account.datasource.module';
 import { faker } from '@faker-js/faker';
 import { balanceBuilder } from '@/domain/balances/entities/__tests__/balance.builder';
 import { balanceTokenBuilder } from '@/domain/balances/entities/__tests__/balance.token.builder';
@@ -61,8 +59,6 @@ describe('Safes Controller Overview (Unit)', () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule.register(testConfiguration)],
     })
-      .overrideModule(AccountDataSourceModule)
-      .useModule(TestAccountDataSourceModule)
       .overrideModule(CacheModule)
       .useModule(TestCacheModule)
       .overrideModule(RequestScopedLoggingModule)
@@ -118,7 +114,7 @@ describe('Safes Controller Overview (Unit)', () => {
       ];
       const currency = faker.finance.currencyCode();
       const nativeCoinPriceProviderResponse = {
-        [chain.pricesProvider.nativeCoin]: {
+        [chain.pricesProvider.nativeCoin!]: {
           [currency.toLowerCase()]: 1536.75,
         },
       };
@@ -278,7 +274,7 @@ describe('Safes Controller Overview (Unit)', () => {
       ];
       const currency = faker.finance.currencyCode();
       const nativeCoinPriceProviderResponse = {
-        [chain.pricesProvider.nativeCoin]: {
+        [chain.pricesProvider.nativeCoin!]: {
           [currency.toLowerCase()]: 1536.75,
         },
       };
@@ -490,10 +486,10 @@ describe('Safes Controller Overview (Unit)', () => {
       ];
       const currency = faker.finance.currencyCode();
       const nativeCoinPriceProviderResponse = {
-        [chain1.pricesProvider.nativeCoin]: {
+        [chain1.pricesProvider.nativeCoin!]: {
           [currency.toLowerCase()]: 1536.75,
         },
-        [chain2.pricesProvider.nativeCoin]: {
+        [chain2.pricesProvider.nativeCoin!]: {
           [currency.toLowerCase()]: 1536.75,
         },
       };
@@ -714,10 +710,10 @@ describe('Safes Controller Overview (Unit)', () => {
       ];
       const currency = faker.finance.currencyCode();
       const nativeCoinPriceProviderResponse = {
-        [chain1.pricesProvider.nativeCoin]: {
+        [chain1.pricesProvider.nativeCoin!]: {
           [currency.toLowerCase()]: 1536.75,
         },
-        [chain2.pricesProvider.nativeCoin]: {
+        [chain2.pricesProvider.nativeCoin!]: {
           [currency.toLowerCase()]: 1536.75,
         },
       };
@@ -895,7 +891,7 @@ describe('Safes Controller Overview (Unit)', () => {
       ];
       const currency = faker.finance.currencyCode();
       const nativeCoinPriceProviderResponse = {
-        [chain.pricesProvider.nativeCoin]: {
+        [chain.pricesProvider.nativeCoin!]: {
           [currency.toLowerCase()]: 1536.75,
         },
       };
@@ -1045,7 +1041,7 @@ describe('Safes Controller Overview (Unit)', () => {
       ];
       const currency = faker.finance.currencyCode();
       const nativeCoinPriceProviderResponse = {
-        [chain.pricesProvider.nativeCoin]: {
+        [chain.pricesProvider.nativeCoin!]: {
           [currency.toLowerCase()]: 1536.75,
         },
       };
@@ -1238,10 +1234,10 @@ describe('Safes Controller Overview (Unit)', () => {
       ];
       const currency = faker.finance.currencyCode();
       const nativeCoinPriceProviderResponse = {
-        [chain1.pricesProvider.nativeCoin]: {
+        [chain1.pricesProvider.nativeCoin!]: {
           [currency.toLowerCase()]: 1536.75,
         },
-        [chain2.pricesProvider.nativeCoin]: {
+        [chain2.pricesProvider.nativeCoin!]: {
           [currency.toLowerCase()]: 1536.75,
         },
       };
@@ -1432,10 +1428,10 @@ describe('Safes Controller Overview (Unit)', () => {
       ];
       const currency = faker.finance.currencyCode();
       const nativeCoinPriceProviderResponse = {
-        [chain1.pricesProvider.nativeCoin]: {
+        [chain1.pricesProvider.nativeCoin!]: {
           [currency.toLowerCase()]: 1536.75,
         },
-        [chain2.pricesProvider.nativeCoin]: {
+        [chain2.pricesProvider.nativeCoin!]: {
           [currency.toLowerCase()]: 1536.75,
         },
       };
@@ -1632,10 +1628,10 @@ describe('Safes Controller Overview (Unit)', () => {
       ];
       const currency = faker.finance.currencyCode();
       const nativeCoinPriceProviderResponse = {
-        [chain1.pricesProvider.nativeCoin]: {
+        [chain1.pricesProvider.nativeCoin!]: {
           [currency.toLowerCase()]: 1536.75,
         },
-        [chain2.pricesProvider.nativeCoin]: {
+        [chain2.pricesProvider.nativeCoin!]: {
           [currency.toLowerCase()]: 1536.75,
         },
       };
@@ -1788,7 +1784,7 @@ describe('Safes Controller Overview (Unit)', () => {
       const chainName = chain.pricesProvider.chainName;
       const currency = faker.finance.currencyCode();
       const nativeCoinPriceProviderResponse = {
-        [nativeCoinId]: { [currency.toLowerCase()]: 1536.75 },
+        [nativeCoinId!]: { [currency.toLowerCase()]: 1536.75 },
       };
       const walletAddress = faker.finance.ethereumAddress();
       const multisigTransactions = [
