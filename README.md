@@ -1,3 +1,4 @@
+# [Deprecated]
 # Safe Client Gateway
 
 [![Coverage Status](https://coveralls.io/repos/github/safe-global/safe-client-gateway/badge.svg?branch=main)](https://coveralls.io/github/safe-global/safe-client-gateway?branch=main)
